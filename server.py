@@ -6,6 +6,8 @@ PORT = 6060
 SERVER = '192.168.1.102'
 FORMAT = 'utf-8'
 DISCONNECT_MSG = 'DISCONNECT'
+TOO_MANY_CONNECTIONS_MSG = '[ERROR] Too many players connected'
+FIRST_MSG = '[NEW CONNECTION] Welcome to the room'
 
 received_msgs = {}
 
@@ -14,13 +16,16 @@ server.bind((SERVER, PORT))
 
 def handle_client(conn, addr):
     # Running concurrently for each client
-    print(f"[NEW CONNECTION] {addr} connected")
     if threading.activeCount() - 1 <= 2:
         connected = True
-    
+        print(f"[NEW CONNECTION] {addr} connected")
+        conn.send(FIRST_MSG.encode(FORMAT))  
     else:
         connected = False
-        send('[ERROR] Too many players connected')
+        print(f"[ERROR] Too many connections, {addr} blocked")
+        conn.send(TOO_MANY_CONNECTIONS_MSG.encode(FORMAT))
+
+    print(connected)
     
     while connected:
         # Blocking line of code

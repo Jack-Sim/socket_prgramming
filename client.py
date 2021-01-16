@@ -5,6 +5,8 @@ PORT = 6060
 SERVER = '192.168.1.102'
 FORMAT = 'utf-8'
 DISCONNECT_MSG = 'DISCONNECT'
+TOO_MANY_CONNECTIONS_MSG = '[ERROR] Too many players connected'
+
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect((SERVER, PORT))
@@ -22,7 +24,15 @@ def send(msg):
     client.send(message)
     print(client.recv(2048).decode(FORMAT))
 
-connected = True
+
+first_msg = client.recv(2048).decode(FORMAT)
+
+print(first_msg)
+
+if first_msg == TOO_MANY_CONNECTIONS_MSG:
+    connected = False
+else:
+    connected = True
 
 while connected:
     msg = input()
